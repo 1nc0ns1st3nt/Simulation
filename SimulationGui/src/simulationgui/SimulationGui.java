@@ -67,7 +67,7 @@ public class SimulationGui extends Application {
         usageLabel = new Label();
         
         df = new DecimalFormat("##.##");
-        df.setRoundingMode(RoundingMode.DOWN);
+        df.setRoundingMode(RoundingMode.UP);
     }
     
     public static void main(String[] args) {
@@ -82,13 +82,16 @@ public class SimulationGui extends Application {
     private String getCostString() {
         Float gas = simulator.totalCostOf(FuelType.Gas) / 100;
         Float elec = simulator.totalCostOf(FuelType.Electricity) / 100;
-        return "Gas: £" + df.format(gas) + " Electricity: £" + df.format(elec) + 
-                " Total: £" + df.format(elec + gas);
+        return "Gas: £" + df.format(gas) + "\nElectricity: £" + df.format(elec) + 
+                "\nTotal: £" + df.format(elec + gas);
     }
     
     private String getUsageString() {
-        return "Gas: " + simulator.totalUsageOf(FuelType.Gas) +
-                "kW Electricity: " + simulator.totalUsageOf(FuelType.Electricity) + "kW";
+        Float gas = simulator.totalUsageOf(FuelType.Gas);
+        Float elec = simulator.totalUsageOf(FuelType.Electricity);
+        return "Gas: " + df.format(simulator.totalUsageOf(FuelType.Gas)) +
+                "kW\nElectricity: " + df.format(simulator.totalUsageOf(FuelType.Electricity)) + 
+                "kW\nTotal: " + df.format(elec + gas) + "kW";
     }
     
     private void resumeTimer() {
@@ -188,12 +191,13 @@ public class SimulationGui extends Application {
         });
         
         priceLabel.setText(getCostString());
-        usageLabel.setText("Gas: 0.0kW Electricity: 0.0kW");
+        usageLabel.setText(getUsageString());
+        
         hbox.getChildren().add(usageLabel);
         hbox.getChildren().add(priceLabel);
         hbox.getChildren().add(simulationControlBtn);
         
-        hbox.setAlignment(Pos.BOTTOM_CENTER);
+        hbox.setAlignment(Pos.CENTER);
         hbox.setSpacing(10);
         
         root.setBottom(hbox);

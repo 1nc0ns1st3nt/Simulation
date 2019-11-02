@@ -1,4 +1,4 @@
-# simulationLib
+# Power Simulation
 Java simulation software for Critical Software: ECSS Hackathon Challenge - 
 
 Done at Microhack in 12-hours

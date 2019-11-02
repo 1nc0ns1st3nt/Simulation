@@ -1,0 +1,12 @@
+Appliance,Fuel type,Usage rate
+Refrigerator,Electricity,5
+Kettle,Electricity,100
+Oven,Gas,3
+Lamp,Electricity,0.5
+Boiler,Gas,10
+Television,Electricity,25
+Games Console,Electricity,30
+Cooking Hob,Gas,6
+PC,Electricity,60
+Stereo System,Electricity,15
+Radiator,Gas,30

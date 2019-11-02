@@ -32,11 +32,14 @@ import SimulationLib.Simulator;
 import SimulationLib.Appliance;
 import SimulationLib.ApplianceInstance;
 import SimulationLib.FuelType;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 
 import javafx.geometry.Pos;
 import javafx.event.ActionEvent;
 
 import javafx.application.Platform;
+import javafx.scene.layout.VBox;
 
 /**
  *
@@ -45,21 +48,26 @@ import javafx.application.Platform;
 
 public class SimulationGui extends Application {
     private final Simulator simulator;
-    private final Pane root;
+    private final BorderPane root;
     private List<ImageView> added_appliances;
     
     private double orgSceneX, orgSceneY;
     private double orgTranslateX, orgTranslateY;
+    private DecimalFormat df;
     
-    private Label priceLabel;
+    private Label priceLabel, usageLabel;
     private Timer timer;
     
     public SimulationGui() {
         super();
         simulator = new Simulator("resources/cost.csv", "resources/costRate.csv");
-        root = new Pane();
+        root = new BorderPane();
         added_appliances = new ArrayList();
         priceLabel = new Label();
+        usageLabel = new Label();
+        
+        df = new DecimalFormat("##.##");
+        df.setRoundingMode(RoundingMode.DOWN);
     }
     
     public static void main(String[] args) {
@@ -72,15 +80,27 @@ public class SimulationGui extends Application {
     }
     
     private String getCostString() {
-        return "Gas: " + simulator.totalCostOf(FuelType.Gas) + " Electricity: " + simulator.totalCostOf(FuelType.Electricity);
+        Float gas = simulator.totalCostOf(FuelType.Gas) / 100;
+        Float elec = simulator.totalCostOf(FuelType.Electricity) / 100;
+        return "Gas: £" + df.format(gas) + " Electricity: £" + df.format(elec) + 
+                " Total: £" + df.format(elec + gas);
     }
+    
+    private String getUsageString() {
+        return "Gas: " + simulator.totalUsageOf(FuelType.Gas) +
+                "kW Electricity: " + simulator.totalUsageOf(FuelType.Electricity) + "kW";
+    }
+    
     private void resumeTimer() {
         timer = new Timer();
         TimerTask repeatedTask = new TimerTask() {
             public void run() {
                 System.out.println("ran it!");
                 simulator.passHour(1);
-                Platform.runLater(() -> priceLabel.setText(getCostString()));;
+                Platform.runLater(() -> {
+                    priceLabel.setText(getCostString());
+                    usageLabel.setText(getUsageString());
+                });
             }
         };
 
@@ -167,16 +187,16 @@ public class SimulationGui extends Application {
             }
         });
         
-        priceLabel.setText("Gas: 0.0 Electricity: 0.0");
-        hbox.getChildren().add(simulationControlBtn);
+        priceLabel.setText(getCostString());
+        usageLabel.setText("Gas: 0.0kW Electricity: 0.0kW");
+        hbox.getChildren().add(usageLabel);
         hbox.getChildren().add(priceLabel);
+        hbox.getChildren().add(simulationControlBtn);
         
-        hbox.setAlignment(Pos.TOP_RIGHT);
+        hbox.setAlignment(Pos.BOTTOM_CENTER);
+        hbox.setSpacing(10);
         
-        BorderPane pane = new BorderPane();
-        pane.setRight(hbox);
-
-        root.getChildren().add(pane);
+        root.setBottom(hbox);
     }
     
     @Override
@@ -194,7 +214,8 @@ public class SimulationGui extends Application {
         
         hbox.getChildren().add(iv1);
         
-        root.getChildren().add(hbox);
+//        root.getChildren().add(hbox);
+        root.setCenter(hbox);
         addControlOverlay(); // let overlay to over the hbox ??
         
         // scene
